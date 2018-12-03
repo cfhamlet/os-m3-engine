@@ -1,0 +1,22 @@
+language: python
+sudo: false
+matrix:
+  include:
+  - python: 2.7
+    env: TOXENV=py27
+  - python: 3.6
+    env: TOXENV=py36
+  - env: TOXENV=coverage
+install:
+- pip install -U pip tox codecov
+script:
+- tox
+after_success:
+- codecov
+deploy:
+  provider: pypi
+  user: cfhamlet
+  password:
+  true:
+    tags: true
+    condition: ${TOXENV} == py27
