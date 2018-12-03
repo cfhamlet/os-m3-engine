@@ -1,9 +1,9 @@
-# os-m3-engine
+# os-3m-engine
 
-[![Build Status](https://www.travis-ci.org/cfhamlet/os-m3-engine.svg?branch=master)](https://www.travis-ci.org/cfhamlet/os-m3-engine)
-[![codecov](https://codecov.io/gh/cfhamlet/os-m3-engine/branch/master/graph/badge.svg)](https://codecov.io/gh/cfhamlet/os-m3-engine)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/os-m3-engine.svg)](https://pypi.python.org/pypi/os-m3-engine)
-[![PyPI](https://img.shields.io/pypi/v/os-m3-engine.svg)](https://pypi.python.org/pypi/os-m3-engine)
+[![Build Status](https://www.travis-ci.org/cfhamlet/os-3m-engine.svg?branch=master)](https://www.travis-ci.org/cfhamlet/os-3m-engine)
+[![codecov](https://codecov.io/gh/cfhamlet/os-3m-engine/branch/master/graph/badge.svg)](https://codecov.io/gh/cfhamlet/os-3m-engine)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/os-3m-engine.svg)](https://pypi.python.org/pypi/os-3m-engine)
+[![PyPI](https://img.shields.io/pypi/v/os-3m-engine.svg)](https://pypi.python.org/pypi/os-3m-engine)
 
 
 Multithread engine for 3(or 2) stage job.
@@ -11,7 +11,7 @@ Multithread engine for 3(or 2) stage job.
 
 # Install
 
-`pip install os-m3-engine`
+`pip install os-3m-engine`
 
 # Usage
 
