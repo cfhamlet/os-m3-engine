@@ -1,5 +1,6 @@
 import logging
 import threading
+
 from .common import Configurable
 
 
@@ -36,9 +37,9 @@ class Othread(Configurable, threading.Thread):
         self._stopping = True
 
 
-class MultithreadManager(Configurable):
+class OthreadManager(Configurable):
     def __init__(self, config, runtime_context, thread_cls, thread_num, driver_cls):
-        super(MultithreadManager, self).__init__(config)
+        super(OthreadManager, self).__init__(config)
         started = threading.Event()
         self._started = started
         self._threads = [thread_cls(config, started, driver_cls, name='%s.%d' % (

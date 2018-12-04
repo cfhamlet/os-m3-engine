@@ -1,5 +1,5 @@
+from .common import Configurable, Queue
 from .driver import Driver
-from .common import Queue
 from .othread import Othread
 
 
@@ -38,3 +38,8 @@ class FrontendThread(Othread):
             self.runtime_context.transport_thread.stop()
         elif hasattr(self.runtime_context, 'backend_thread'):
             self.runtime_context.backend_thread.stop()
+
+
+class Frontend(Configurable):
+    def generate(self):
+        raise NotImplementedError

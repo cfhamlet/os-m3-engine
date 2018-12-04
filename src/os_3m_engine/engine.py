@@ -3,61 +3,27 @@ import signal
 import sys
 import threading
 import time
-from .common import Configurable, RuntimeContext, Queue
-from .frontend import FrontendThread
-from .transport import TransportThread
-from .backend import BackendThread
-from .othread import MultithreadManager
-from .utils import getatters
+
+from .backend import BackendThread, BackendDriver
+from .common import Configurable, Queue, RuntimeContext
+from .frontend import FrontendThread, FrontendDriver
+from .transport import TransportThread, TransportDriver, BridgeDriver
+from .utils import getatters, getlastattr
+from .othread import OthreadManager
 
 
-class MultithreadEngine(Configurable):
+class Engine(Configurable):
 
-    def __init__(self, config):
-        super(MultithreadEngine, self).__init__(config)
-        self.__ensure()
+    def __init__(self, config, runtime_context):
+        super(Engine, self).__init__(config)
         self.__start_lock = threading.Lock()
         self.__started = False
         self.__stopped = False
-        self._runtime_context = RuntimeContext()
+        self._runtime_context = runtime_context
 
-    def __ensure(self):
-        engine_config = self.config.engine
-        assert any([hasattr(engine_config, x)
-                    for x in ('transport', 'backend')])
+    def start(self):
 
-    def __setup(self):
-        runtime_context = self._runtime_context
-        engine_config = self.config.engine
-
-        runtime_context.frontend_thread_queue = Queue.Queue(
-            engine_config.frontend.queue_size)
-
-        runtime_context.frontend_thread = MultithreadManager(
-            self.config, runtime_context,
-            FrontendThread, engine_config.frontend.thread_num,
-            engine_config.frontend.driver_cls)
-        runtime_context.frontend_thread.setDaemon(True)
-
-        if hasattr(engine_config, 'transport'):
-
-            if hasattr(engine_config, 'backend'):
-                runtime_context.backend_thread_queue = Queue.Queue(
-                    engine_config.backend.queue_size)
-
-            runtime_context.transport_thread = MultithreadManager(
-                self.config, runtime_context,
-                TransportThread, engine_config.transport.thread_num,
-                engine_config.transport.driver_cls)
-
-        if hasattr(engine_config, 'backend'):
-            runtime_context.backend_thread = MultithreadManager(
-                self.config, runtime_context,
-                BackendThread, engine_config.backend.thread_num,
-                engine_config.backend.driver_cls)
-
-    def __start(self):
-
+        self.__acquire_start_lock(False, 'Can not start twice')
         runtime_context = self._runtime_context
         m = getatters(runtime_context, [
                       'backend_thread',
@@ -87,11 +53,6 @@ class MultithreadEngine(Configurable):
             finally:
                 self.__start_lock.release()
 
-    def start(self):
-        self.__acquire_start_lock(False, 'Can not start twice')
-        self.__setup()
-        self.__start()
-
     def __stop(self):
         runtime_context = self._runtime_context
         runtime_context.frontend_thread.stop()
@@ -106,3 +67,58 @@ class MultithreadEngine(Configurable):
         if not self.__stopped:
             self.__stop()
         self.__start_lock.release()
+
+
+class DEFAULT_FRONTEND_CONFIG(object):
+    thread_num = 1
+    driver_cls = FrontendDriver
+
+
+class DEFAULT_TRANSPORT_CONFIG(object):
+    thread_num = 10
+
+
+class DEFAULT_BACKEND_CONFIG(object):
+    thread_num = 
+
+
+def create(frontend_config=DEFAULT_FRONTEND_CONFIG,
+           transport_config=DEFAULT_TRANSPORT_CONFIG,
+           backend_config=DEFAULT_BACKEND_CONFIG,
+           app_config=None, runtime_context=None):
+
+    if frontend_config is None:
+        raise ValueError('No frontend config')
+
+    if transport_config is None and backend_config is None:
+        raise ValueError('Config at least one of transport/backend')
+
+    runtime_context = runtime_context if runtime_context is not None else RuntimeContext()
+
+    runtime_context.frontend_thread_queue = Queue.Queue(
+        engine_config.frontend.queue_size)
+
+    runtime_context.frontend_thread = OthreadManager(
+        app_config, runtime_context,
+        FrontendThread, engine_config.frontend.thread_num,
+        engine_config.frontend.driver_cls)
+    runtime_context.frontend_thread.setDaemon(True)
+
+    if hasattr(engine_config, 'transport'):
+
+        if hasattr(engine_config, 'backend'):
+            runtime_context.backend_thread_queue = Queue.Queue(
+                engine_config.backend.queue_size)
+
+        runtime_context.transport_thread = OthreadManager(
+            app_config, runtime_context,
+            TransportThread, engine_config.transport.thread_num,
+            engine_config.transport.driver_cls)
+
+    if hasattr(engine_config, 'backend'):
+        runtime_context.backend_thread = OthreadManager(
+            app_config, runtime_context,
+            BackendThread, engine_config.backend.thread_num,
+            engine_config.backend.driver_cls)
+
+    return Engine(engine_config, runtime_context)

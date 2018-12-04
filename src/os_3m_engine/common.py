@@ -1,5 +1,6 @@
 
 import sys
+
 _PY3 = sys.version_info[0] == 3
 
 if _PY3:

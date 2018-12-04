@@ -1,4 +1,4 @@
-from .common import Queue
+from .common import Configurable, Queue
 from .driver import Driver
 from .othread import Othread
 
@@ -57,3 +57,8 @@ class TransportThread(Othread):
         self.runtime_context.frontend_thread.stop()
         if hasattr(self.runtime_context, 'backend_thread'):
             self.runtime_context.backend_thread.stop()
+
+
+class Transport(Configurable):
+    def transport(self):
+        raise NotImplementedError
