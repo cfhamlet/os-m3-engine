@@ -15,9 +15,14 @@ FRONTEND_ENGINE_CONFIG = Config.create(
 TRANSPORT_ENGINE_CONFIG = Config.create(
     thread_cls='os_3m_engine.core.transport.TransportThread',
     thread_num=3,
-    driver_cls='os_3m_engine.core.transport.BridgeDriver',
+    driver_cls='os_3m_engine.core.transport.TransportDriver',
     component_factory_cls='os_3m_engine.common.ComponentFactory',
 )
+
+TRANSPORT_BRIDGE_ENGINE_CONFIG = Config.create()
+TRANSPORT_BRIDGE_ENGINE_CONFIG.update(TRANSPORT_ENGINE_CONFIG)
+TRANSPORT_BRIDGE_ENGINE_CONFIG.driver_cls = 'os_3m_engine.core.transport.BridgeDriver'
+
 BACKEND_ENGINE_CONFIG = Config.create(
     thread_cls='os_3m_engine.core.backend.BackendThread',
     thread_num=1,
@@ -47,7 +52,7 @@ def create(frontend_cls='os_3m_engine.ootb.StdinFrontend',
            app_config=None,
            engine_config=ENGINE_CONFIG,
            frontend_engine_config=FRONTEND_ENGINE_CONFIG,
-           transport_engine_config=TRANSPORT_ENGINE_CONFIG,
+           transport_engine_config=TRANSPORT_BRIDGE_ENGINE_CONFIG,
            backend_engine_config=BACKEND_ENGINE_CONFIG,
            runtime_context=None):
 
@@ -57,20 +62,12 @@ def create(frontend_cls='os_3m_engine.ootb.StdinFrontend',
     if transport_cls is None and backend_cls is None:
         raise ValueError('Spiecify at least one of transport_cls/backend_cls')
 
-    engine_config = combine_from_default_config(ENGINE_CONFIG, engine_config)
-
-    frontend_engine_config = combine_from_default_config(
-        FRONTEND_ENGINE_CONFIG, frontend_engine_config)
-
-    transport_engine_config = combine_from_default_config(
-        TRANSPORT_ENGINE_CONFIG, transport_engine_config)
-
-    backend_engine_config = combine_from_default_config(
-        BACKEND_ENGINE_CONFIG, backend_engine_config)
-
     runtime_context = runtime_context if runtime_context is not None else RuntimeContext()
 
     # init frontend
+    frontend_engine_config = combine_from_default_config(
+        FRONTEND_ENGINE_CONFIG, frontend_engine_config)
+
     runtime_context.frontend_thread_queue = Queue.Queue(
         frontend_engine_config.queue_size)
 
@@ -82,6 +79,18 @@ def create(frontend_cls='os_3m_engine.ootb.StdinFrontend',
     runtime_context.frontend_thread.setDaemon(True)
 
     # init transport
+    default_transport_engine_config = TRANSPORT_BRIDGE_ENGINE_CONFIG \
+        if backend_cls is not None else TRANSPORT_ENGINE_CONFIG
+
+    if transport_engine_config in (TRANSPORT_ENGINE_CONFIG, TRANSPORT_BRIDGE_ENGINE_CONFIG):
+        transport_engine_config = None
+
+    transport_engine_config = combine_from_default_config(
+        default_transport_engine_config, transport_engine_config)
+
+    backend_engine_config = combine_from_default_config(
+        BACKEND_ENGINE_CONFIG, backend_engine_config)
+
     if transport_cls:
         if backend_cls:
             runtime_context.backend_thread_queue = Queue.Queue(
@@ -101,4 +110,5 @@ def create(frontend_cls='os_3m_engine.ootb.StdinFrontend',
         runtime_context.backend_thread = OthreadManager(
             backend_engine_config, runtime_context, backend_factory)
 
+    engine_config = combine_from_default_config(ENGINE_CONFIG, engine_config)
     return Engine(engine_config, runtime_context)

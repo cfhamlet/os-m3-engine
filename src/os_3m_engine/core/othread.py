@@ -59,6 +59,10 @@ class OthreadManager(Configurable):
             name='%s-%d' % (thread_cls.__name__, i))
             for i in range(0, engine_config.thread_num)]
 
+    @property
+    def thread_num(self):
+        return len(self._threads)
+
     def start(self):
         while not self._start_trigger.wait(0.1):
             if self._start_trigger.is_set():

@@ -18,6 +18,12 @@ class Engine(Configurable):
         self.__stopped = False
         self._runtime_context = runtime_context
 
+    def started(self):
+        return self.__started
+
+    def stopped(self):
+        return self.__stopped
+
     def start(self):
 
         self.__acquire_start_lock(False, 'Can not start twice')
@@ -33,7 +39,7 @@ class Engine(Configurable):
         self.__start_lock.release()
 
         while not any([x.stopped() for x in m]):
-            time.sleep(0.1)
+            time.sleep(self.config.main_loop_wait)
 
         m = getatters(runtime_context, [
             'transport_thread',
@@ -58,6 +64,7 @@ class Engine(Configurable):
         elif hasattr(runtime_context, 'backend_thread'):
             runtime_context.backend_thread.stop()
         self.__stopped = True
+        self.__started = False
 
     def stop(self):
         self.__acquire_start_lock(True, 'Can stop before start')
