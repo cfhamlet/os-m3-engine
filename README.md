@@ -6,7 +6,7 @@
 [![PyPI](https://img.shields.io/pypi/v/os-3m-engine.svg)](https://pypi.python.org/pypi/os-3m-engine)
 
 
-Multithread engine for 3(or 2) stage job.
+Multithread engine for 3(or 2) stages job.
  
 
 # Install

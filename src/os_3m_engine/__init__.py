@@ -1,7 +1,6 @@
 import sys
-from .engine import create
 
-__all__ = ['__version__', 'version_info', 'create']
+__all__ = ['__version__', 'version_info']
 
 import pkgutil
 __version__ = pkgutil.get_data(__package__, 'VERSION').decode('ascii').strip()
