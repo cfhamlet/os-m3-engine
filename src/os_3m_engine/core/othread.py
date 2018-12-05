@@ -64,10 +64,11 @@ class OthreadManager(Configurable):
         return len(self._threads)
 
     def start(self):
+        list(map(lambda t: t.start(), self._threads))
         while not self._start_trigger.wait(0.1):
             if self._start_trigger.is_set():
                 break
-            list(map(lambda t: t.start(), self._threads))
+            
 
     def setDaemon(self, daemonic):
         list(map(lambda t: t.setDaemon(daemonic), self._threads))
