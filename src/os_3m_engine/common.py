@@ -9,6 +9,11 @@ if _PY3:
     binary_stdin = sys.stdin.buffer
 else:
     import Queue
+    if sys.platform == "win32":
+        # set sys.stdin to binary mode
+        import os
+        import msvcrt
+        msvcrt.setmode(sys.stdin.fileno(), os.O_BINARY)
     binary_stdin = sys.stdin
 
 
