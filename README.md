@@ -35,11 +35,11 @@ Something else need to know:
 
 # API
 
-* Create a default engine, a typical 3-stage job:
+* Create default engine, a typical 3-stage job:
 
-    frontend: ``os_3m_engine.ootb.StdinFrontend``, read from stdin, send to transport stage
-    transport: ``os_3m_engine.ootb.LogTransport``, log data received from fronted, send to backend stage
-    backend: ``os_3m_engine.ootb.LogBackend``, log data received from transport
+    - frontend: ``os_3m_engine.ootb.StdinFrontend``, read from stdin, send to transport stage
+    - transport: ``os_3m_engine.ootb.LogTransport``, log data received from fronted, send to backend stage
+    - backend: ``os_3m_engine.ootb.LogBackend``, log data received from transport
 
     ```
     from os_3m_engine.launcher import create
@@ -91,8 +91,8 @@ Something else need to know:
     
 * Custom frontend class:
 
-    1. inherit from ``os_3m_engine.core.frontend.Frontend``
-    2. define ``produce`` method as generator
+    - inherit from ``os_3m_engine.core.frontend.Frontend``
+    - define ``produce`` method as generator
 
     ```
     from os_3m_engine.core.frontend import Frontend
@@ -104,8 +104,8 @@ Something else need to know:
     
 * Custom transport class:
 
-    1. inherit from ``os_3m_engine.core.transport.Transport``
-    2. define ``transport`` method, the only parameter is the data received, the return value will be sent to backend
+    - inherit from ``os_3m_engine.core.transport.Transport``
+    - define ``transport`` method, the only parameter is the data received, the return value will be sent to backend
 
     ```
     from os_3m_engine.core.transport import Transport
@@ -117,8 +117,8 @@ Something else need to know:
 
 * Custom backend class:
 
-    1. inherit from ``os_3m_engine.core.backend.Backend``
-    2. define ``process`` method, the only parameter is the data received, no need return
+    - inherit from ``os_3m_engine.core.backend.Backend``
+    - define ``process`` method, the only parameter is the data received, no need return
 
     ```
     from os_3m_engine.core.backend import Backend
@@ -130,8 +130,8 @@ Something else need to know:
 
 * Passing parameters
 
-    * create engine with custom config object
-    * use ``self.config`` to get the config in stage class
+    - create engine with custom config object
+    - use ``self.config`` to get the config in stage class
 
     ```
     from os_3m_engine.launcher import create
@@ -143,7 +143,8 @@ Something else need to know:
 
 * Custom ``setup``, ``cleanup`` behavior
   
-    each stage class can define ``setup``, ``cleanup`` methods, these will be called at each thread start/stop
+    - each stage class can define ``setup``, ``cleanup`` methods
+    - these will be called at each thread start/stop
     
     
     ```
