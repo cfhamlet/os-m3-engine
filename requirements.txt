@@ -1,1 +1,2 @@
+six
 os-config>0.1

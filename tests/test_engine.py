@@ -37,3 +37,14 @@ def test_engine_002(config):
     engine.stop()
     t1.join()
     assert engine.stopped()
+
+
+def test_engine_003(config):
+    from misc import OneRecordFrontend
+
+    engine = create(
+        frontend_cls=OneRecordFrontend,
+        transport_cls='misc.ConfirmTransport',
+        backend_cls='misc.ConfirmBackend',
+    )
+    engine.start()
