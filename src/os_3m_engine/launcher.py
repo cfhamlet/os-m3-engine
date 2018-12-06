@@ -5,25 +5,26 @@ from .core.engine import Engine, RuntimeContext
 from .core.othread import OthreadManager
 from .utils import load_class
 
-FRONTEND_ENGINE_CONFIG = Config.create(
+ENGINE_FRONTEND_CONFIG = Config.create(
     thread_cls='os_3m_engine.core.frontend.FrontendThread',
     thread_num=1,
     driver_cls='os_3m_engine.core.frontend.FrontendDriver',
     component_factory_cls='os_3m_engine.common.ComponentFactory',
     queue_size=100,
 )
-TRANSPORT_ENGINE_CONFIG = Config.create(
+
+ENGINE_TRANSPORT_CONFIG = Config.create(
     thread_cls='os_3m_engine.core.transport.TransportThread',
     thread_num=3,
     driver_cls='os_3m_engine.core.transport.TransportDriver',
     component_factory_cls='os_3m_engine.common.ComponentFactory',
 )
 
-TRANSPORT_BRIDGE_ENGINE_CONFIG = Config.create()
-TRANSPORT_BRIDGE_ENGINE_CONFIG.update(TRANSPORT_ENGINE_CONFIG)
-TRANSPORT_BRIDGE_ENGINE_CONFIG.driver_cls = 'os_3m_engine.core.transport.BridgeDriver'
+ENGINE_TRANSPORT_BRIDGE_CONFIG = Config.create()
+ENGINE_TRANSPORT_BRIDGE_CONFIG.update(ENGINE_TRANSPORT_CONFIG)
+ENGINE_TRANSPORT_BRIDGE_CONFIG.driver_cls = 'os_3m_engine.core.transport.BridgeDriver'
 
-BACKEND_ENGINE_CONFIG = Config.create(
+ENGINE_BACKEND_CONFIG = Config.create(
     thread_cls='os_3m_engine.core.backend.BackendThread',
     thread_num=1,
     driver_cls='os_3m_engine.core.backend.BackendDriver',
@@ -36,7 +37,16 @@ ENGINE_CONFIG = Config.create(
 )
 
 
-def combine_from_default_config(default_config, custom_config):
+def _queue_size(custorm_config, default_config, thread_num):
+    queue_size = custorm_config.queue_size if hasattr(
+        custorm_config, 'queue_size') else default_config.queue_size
+    if custorm_config == default_config \
+            or not hasattr(custorm_config, 'queue_size'):
+        queue_size = max(queue_size, thread_num*2)
+    return queue_size
+
+
+def combine_with_default_config(default_config, custom_config):
     c = Config.create()
     c.update(default_config)
     if custom_config is not None:
@@ -51,9 +61,9 @@ def create(frontend_cls='os_3m_engine.ootb.StdinFrontend',
            backend_cls='os_3m_engine.ootb.LogBackend',
            app_config=None,
            engine_config=ENGINE_CONFIG,
-           frontend_engine_config=FRONTEND_ENGINE_CONFIG,
-           transport_engine_config=TRANSPORT_BRIDGE_ENGINE_CONFIG,
-           backend_engine_config=BACKEND_ENGINE_CONFIG,
+           engine_frontend_config=ENGINE_FRONTEND_CONFIG,
+           engine_transport_config=ENGINE_TRANSPORT_BRIDGE_CONFIG,
+           engine_backend_config=ENGINE_BACKEND_CONFIG,
            runtime_context=None):
 
     if frontend_cls is None:
@@ -65,50 +75,69 @@ def create(frontend_cls='os_3m_engine.ootb.StdinFrontend',
     runtime_context = runtime_context if runtime_context is not None else RuntimeContext()
 
     # init frontend
-    frontend_engine_config = combine_from_default_config(
-        FRONTEND_ENGINE_CONFIG, frontend_engine_config)
-
-    runtime_context.frontend_thread_queue = Queue.Queue(
-        frontend_engine_config.queue_size)
+    e_frontend_config = combine_with_default_config(
+        ENGINE_FRONTEND_CONFIG, engine_frontend_config)
 
     frontend_factory_cls = load_class(
-        frontend_engine_config.component_factory_cls, ConfigurableFactory)
+        e_frontend_config.component_factory_cls, ConfigurableFactory)
     frontend_factory = frontend_factory_cls(app_config, frontend_cls)
     runtime_context.frontend_thread = OthreadManager(
-        frontend_engine_config, runtime_context, frontend_factory)
+        e_frontend_config, runtime_context, frontend_factory)
     runtime_context.frontend_thread.setDaemon(True)
 
     # init transport
-    default_transport_engine_config = TRANSPORT_BRIDGE_ENGINE_CONFIG \
-        if backend_cls is not None else TRANSPORT_ENGINE_CONFIG
+    default_engine_transport_config = ENGINE_TRANSPORT_BRIDGE_CONFIG \
+        if backend_cls is not None else ENGINE_TRANSPORT_CONFIG
 
-    if transport_engine_config in (TRANSPORT_ENGINE_CONFIG, TRANSPORT_BRIDGE_ENGINE_CONFIG):
-        transport_engine_config = None
+    e_transport_config = engine_backend_config
+    if engine_transport_config in (ENGINE_TRANSPORT_CONFIG, ENGINE_TRANSPORT_BRIDGE_CONFIG):
+        e_transport_config = None
 
-    transport_engine_config = combine_from_default_config(
-        default_transport_engine_config, transport_engine_config)
+    e_transport_config = combine_with_default_config(
+        default_engine_transport_config, e_transport_config)
 
-    backend_engine_config = combine_from_default_config(
-        BACKEND_ENGINE_CONFIG, backend_engine_config)
+    e_backend_config = combine_with_default_config(
+        ENGINE_BACKEND_CONFIG, engine_backend_config)
 
     if transport_cls:
+        queue_size = _queue_size(
+            engine_frontend_config,
+            ENGINE_FRONTEND_CONFIG,
+            e_transport_config.thread_num)
+        e_frontend_config.queue_size = queue_size
+        runtime_context.frontend_thread_queue = Queue.Queue(queue_size)
+
         if backend_cls:
-            runtime_context.backend_thread_queue = Queue.Queue(
-                backend_engine_config.queue_size)
+            queue_size = _queue_size(
+                engine_backend_config,
+                ENGINE_BACKEND_CONFIG,
+                e_backend_config.thread_num)
+            queue_size = max(queue_size, e_frontend_config.queue_size)
+            e_backend_config.queue_size = queue_size
+            runtime_context.backend_thread_queue = Queue.Queue(queue_size)
 
         transport_factory_cls = load_class(
-            transport_engine_config.component_factory_cls, ConfigurableFactory)
+            e_transport_config.component_factory_cls, ConfigurableFactory)
         transport_factory = transport_factory_cls(app_config, transport_cls)
         runtime_context.transport_thread = OthreadManager(
-            transport_engine_config, runtime_context, transport_factory)
+            e_transport_config, runtime_context, transport_factory)
+    else:
+        queue_size = _queue_size(
+            engine_frontend_config,
+            ENGINE_FRONTEND_CONFIG,
+            e_backend_config.thread_num)
 
-    # init backend
+        e_frontend_config.queue_size = queue_size
+        e_backend_config.queue_size = queue_size
+        runtime_context.frontend_thread_queue = Queue.Queue(queue_size)
+
+        # init backend
     if backend_cls:
         backend_factory_cls = load_class(
-            backend_engine_config.component_factory_cls, ConfigurableFactory)
+            e_backend_config.component_factory_cls, ConfigurableFactory)
         backend_factory = backend_factory_cls(app_config, backend_cls)
         runtime_context.backend_thread = OthreadManager(
-            backend_engine_config, runtime_context, backend_factory)
+            e_backend_config, runtime_context, backend_factory)
 
-    engine_config = combine_from_default_config(ENGINE_CONFIG, engine_config)
-    return Engine(engine_config, runtime_context)
+    e_config = combine_with_default_config(ENGINE_CONFIG, engine_config)
+    return Engine(e_config, runtime_context)
