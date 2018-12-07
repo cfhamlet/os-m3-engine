@@ -1,9 +1,9 @@
-# os-3m-engine
+# os-m3-engine
 
-[![Build Status](https://www.travis-ci.org/cfhamlet/os-3m-engine.svg?branch=master)](https://www.travis-ci.org/cfhamlet/os-3m-engine)
-[![codecov](https://codecov.io/gh/cfhamlet/os-3m-engine/branch/master/graph/badge.svg)](https://codecov.io/gh/cfhamlet/os-3m-engine)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/os-3m-engine.svg)](https://pypi.python.org/pypi/os-3m-engine)
-[![PyPI](https://img.shields.io/pypi/v/os-3m-engine.svg)](https://pypi.python.org/pypi/os-3m-engine)
+[![Build Status](https://www.travis-ci.org/cfhamlet/os-m3-engine.svg?branch=master)](https://www.travis-ci.org/cfhamlet/os-m3-engine)
+[![codecov](https://codecov.io/gh/cfhamlet/os-m3-engine/branch/master/graph/badge.svg)](https://codecov.io/gh/cfhamlet/os-m3-engine)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/os-m3-engine.svg)](https://pypi.python.org/pypi/os-m3-engine)
+[![PyPI](https://img.shields.io/pypi/v/os-m3-engine.svg)](https://pypi.python.org/pypi/os-m3-engine)
 
 Multi-thread engine for 3(or 2) stages job.
 
@@ -31,18 +31,18 @@ Something else need to know:
 
 # Install
 
-`pip install os-3m-engine`
+`pip install os-m3-engine`
 
 # API
 
 * Create default engine, a typical 3-stage job:
 
-    - frontend: ``os_3m_engine.ootb.StdinFrontend``, read from stdin, send to transport stage
-    - transport: ``os_3m_engine.ootb.LogTransport``, log data received from fronted, send to backend stage
-    - backend: ``os_3m_engine.ootb.LogBackend``, log data received from transport
+    - frontend: ``os_m3_engine.ootb.StdinFrontend``, read from stdin, send to transport stage
+    - transport: ``os_m3_engine.ootb.LogTransport``, log data received from fronted, send to backend stage
+    - backend: ``os_m3_engine.ootb.LogBackend``, log data received from transport
 
     ```
-    from os_3m_engine.launcher import create
+    from os_m3_engine.launcher import create
     
     engine = create()
     ```
@@ -50,7 +50,7 @@ Something else need to know:
 * Create engine with custom defined stage:
 
     ```
-    from os_3m_engine.launcher import create
+    from os_m3_engine.launcher import create
     
     engine = create(transport_cls='transport_class_path_or_class')
     ```
@@ -58,7 +58,7 @@ Something else need to know:
 * Create engine with custom engine config:
 
     ```
-    from os_3m_engine.launcher import create
+    from os_m3_engine.launcher import create
     
     config = WhateverOjbectYouWant
     config.thread_num = 10
@@ -77,7 +77,7 @@ Something else need to know:
 
     ```
     from signal
-    from os_3m_engine.launcher import create
+    from os_m3_engine.launcher import create
     
     engine = create()
     
@@ -91,11 +91,11 @@ Something else need to know:
     
 * Custom frontend class:
 
-    - inherit from ``os_3m_engine.core.frontend.Frontend``
+    - inherit from ``os_m3_engine.core.frontend.Frontend``
     - define ``produce`` method as generator
 
     ```
-    from os_3m_engine.core.frontend import Frontend
+    from os_m3_engine.core.frontend import Frontend
     
     class CustomFrontend(Frontend):
         def produce(self):
@@ -104,11 +104,11 @@ Something else need to know:
     
 * Custom transport class:
 
-    - inherit from ``os_3m_engine.core.transport.Transport``
+    - inherit from ``os_m3_engine.core.transport.Transport``
     - define ``transport`` method, the only parameter is the data received, the return value will be sent to backend
 
     ```
-    from os_3m_engine.core.transport import Transport
+    from os_m3_engine.core.transport import Transport
     
     class CustomTransport(Transport):
         def transport(self, data):
@@ -117,11 +117,11 @@ Something else need to know:
 
 * Custom backend class:
 
-    - inherit from ``os_3m_engine.core.backend.Backend``
+    - inherit from ``os_m3_engine.core.backend.Backend``
     - define ``process`` method, the only parameter is the data received, no need return
 
     ```
-    from os_3m_engine.core.backend import Backend
+    from os_m3_engine.core.backend import Backend
     
     class CustomBackend(Backend):
         def process(self, data):
@@ -134,7 +134,7 @@ Something else need to know:
     - use ``self.config`` to get the config in stage class
 
     ```
-    from os_3m_engine.launcher import create
+    from os_m3_engine.launcher import create
     
     config = WhateverOjbectYouWant
     engine = create(app_config=config)
@@ -148,7 +148,7 @@ Something else need to know:
     
     
     ```
-    from os_3m_engine.core.backend import Backend
+    from os_m3_engine.core.backend import Backend
     
     class CustomBackend(Backend):
     

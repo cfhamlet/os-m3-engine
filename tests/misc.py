@@ -1,7 +1,7 @@
 import time
-from os_3m_engine.core.backend import Backend
-from os_3m_engine.core.frontend import Frontend
-from os_3m_engine.core.transport import Transport
+from os_m3_engine.core.backend import Backend
+from os_m3_engine.core.frontend import Frontend
+from os_m3_engine.core.transport import Transport
 
 DATA = 'Hello World!'
 

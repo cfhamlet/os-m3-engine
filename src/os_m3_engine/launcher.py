@@ -6,29 +6,29 @@ from .core.othread import OthreadManager
 from .utils import load_class
 
 ENGINE_FRONTEND_CONFIG = Config.create(
-    thread_cls='os_3m_engine.core.frontend.FrontendThread',
+    thread_cls='os_m3_engine.core.frontend.FrontendThread',
     thread_num=1,
-    driver_cls='os_3m_engine.core.frontend.FrontendDriver',
-    component_factory_cls='os_3m_engine.common.ComponentFactory',
+    driver_cls='os_m3_engine.core.frontend.FrontendDriver',
+    component_factory_cls='os_m3_engine.common.ComponentFactory',
     queue_size=100,
 )
 
 ENGINE_TRANSPORT_CONFIG = Config.create(
-    thread_cls='os_3m_engine.core.transport.TransportThread',
+    thread_cls='os_m3_engine.core.transport.TransportThread',
     thread_num=3,
-    driver_cls='os_3m_engine.core.transport.TransportDriver',
-    component_factory_cls='os_3m_engine.common.ComponentFactory',
+    driver_cls='os_m3_engine.core.transport.TransportDriver',
+    component_factory_cls='os_m3_engine.common.ComponentFactory',
 )
 
 ENGINE_TRANSPORT_BRIDGE_CONFIG = Config.create()
 ENGINE_TRANSPORT_BRIDGE_CONFIG.update(ENGINE_TRANSPORT_CONFIG)
-ENGINE_TRANSPORT_BRIDGE_CONFIG.driver_cls = 'os_3m_engine.core.transport.BridgeDriver'
+ENGINE_TRANSPORT_BRIDGE_CONFIG.driver_cls = 'os_m3_engine.core.transport.BridgeDriver'
 
 ENGINE_BACKEND_CONFIG = Config.create(
-    thread_cls='os_3m_engine.core.backend.BackendThread',
+    thread_cls='os_m3_engine.core.backend.BackendThread',
     thread_num=1,
-    driver_cls='os_3m_engine.core.backend.BackendDriver',
-    component_factory_cls='os_3m_engine.common.ComponentFactory',
+    driver_cls='os_m3_engine.core.backend.BackendDriver',
+    component_factory_cls='os_m3_engine.common.ComponentFactory',
     queue_size=100,
 )
 
@@ -56,9 +56,9 @@ def combine_with_default_config(default_config, custom_config):
     return c
 
 
-def create(frontend_cls='os_3m_engine.ootb.StdinFrontend',
-           transport_cls='os_3m_engine.ootb.LogTransport',
-           backend_cls='os_3m_engine.ootb.LogBackend',
+def create(frontend_cls='os_m3_engine.ootb.StdinFrontend',
+           transport_cls='os_m3_engine.ootb.LogTransport',
+           backend_cls='os_m3_engine.ootb.LogBackend',
            app_config=None,
            engine_config=ENGINE_CONFIG,
            engine_frontend_config=ENGINE_FRONTEND_CONFIG,

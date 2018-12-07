@@ -1,7 +1,7 @@
 import pytest
 
-from os_3m_engine.core.engine import RuntimeContext
-from os_3m_engine.launcher import create
+from os_m3_engine.core.engine import RuntimeContext
+from os_m3_engine.launcher import create
 
 
 @pytest.fixture(scope='function')

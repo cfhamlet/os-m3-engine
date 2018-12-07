@@ -3,7 +3,7 @@ import time
 
 import pytest
 
-from os_3m_engine.launcher import create
+from os_m3_engine.launcher import create
 
 
 @pytest.fixture(scope='function')
