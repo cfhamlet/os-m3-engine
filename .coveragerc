@@ -1,9 +1,9 @@
 [run]
 parallel = true
 branch = true
-source = os_3m_engine
+source = os_m3_engine
 
 [paths]
 source =
-    src/os_3m_engine
-    .tox/*/lib/python*/site-packages/os_3m_engine
+    src/os_m3_engine
+    .tox/*/lib/python*/site-packages/os_m3_engine

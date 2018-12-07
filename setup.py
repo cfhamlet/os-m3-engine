@@ -14,8 +14,8 @@ def read(*filenames, **kwargs):
 
 
 setup(
-    name='os-3m-engine',
-    version=read('src/os_3m_engine/VERSION'),
+    name='os-m3-engine',
+    version=read('src/os_m3_engine/VERSION'),
     packages=find_packages(where='src'),
     package_dir={'': 'src'},
     include_package_data=True,
@@ -24,7 +24,7 @@ setup(
     long_description=open('README.md').read(),
     author='Ozzy',
     author_email='cfhamlet@gmail.com',
-    url='https://github.com/cfhamlet/os-3m-engine',
+    url='https://github.com/cfhamlet/os-m3-engine',
     install_requires=open('requirements.txt').read().split('\n'),
     zip_safe=False,
     classifiers=[
