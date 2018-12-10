@@ -68,6 +68,8 @@ class Engine(Configurable):
 
     def stop(self):
         self.__acquire_start_lock(True, 'Can stop before start')
-        if not self.__stopped:
-            self.__stop()
-        self.__start_lock.release()
+        try:
+            if not self.__stopped:
+                self.__stop()
+        finally:
+            self.__start_lock.release()
