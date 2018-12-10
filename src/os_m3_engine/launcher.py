@@ -89,7 +89,7 @@ def create(frontend_cls='os_m3_engine.ootb.StdinFrontend',
     default_engine_transport_config = ENGINE_TRANSPORT_BRIDGE_CONFIG \
         if backend_cls is not None else ENGINE_TRANSPORT_CONFIG
 
-    e_transport_config = engine_backend_config
+    e_transport_config = engine_transport_config
     if engine_transport_config in (ENGINE_TRANSPORT_CONFIG, ENGINE_TRANSPORT_BRIDGE_CONFIG):
         e_transport_config = None
 
