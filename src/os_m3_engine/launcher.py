@@ -21,7 +21,7 @@ ENGINE_TRANSPORT_CONFIG = Config.create(
 )
 
 ENGINE_TRANSPORT_BRIDGE_CONFIG = Config.create()
-ENGINE_TRANSPORT_BRIDGE_CONFIG.update(ENGINE_TRANSPORT_CONFIG)
+Config.update(ENGINE_TRANSPORT_BRIDGE_CONFIG, ENGINE_TRANSPORT_CONFIG)
 ENGINE_TRANSPORT_BRIDGE_CONFIG.driver_cls = 'os_m3_engine.core.transport.BridgeDriver'
 
 ENGINE_BACKEND_CONFIG = Config.create(
@@ -48,7 +48,7 @@ def _queue_size(custorm_config, default_config, thread_num):
 
 def combine_with_default_config(default_config, custom_config):
     c = Config.create()
-    c.update(default_config)
+    Config.update(c, default_config)
     if custom_config is not None:
         for k, _ in default_config:
             if hasattr(custom_config, k):
