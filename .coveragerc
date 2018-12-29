@@ -7,3 +7,4 @@ source = os_m3_engine
 source =
     src/os_m3_engine
     .tox/*/lib/python*/site-packages/os_m3_engine
+    .tox/*/site-packages/os_m3_engine
