@@ -1,2 +1,2 @@
 six
-os-config>0.1
+os-config>=0.2.2
